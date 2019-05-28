@@ -94,12 +94,8 @@ class App {
 		// create the mailing component lazily
 		$this->mail = null;
 
-		// initialize the authentication component
-		$this->auth = new Auth(
-			$this->db(),
-			$this->getClientIp(),
-			!empty($_ENV['DB_PREFIX']) ? $_ENV['DB_PREFIX'] : null
-		);
+        // create the authentication component lazily
+		$this->auth = null;
 
 		// create the ID encoder and decoder lazily
 		$this->ids = null;
@@ -231,9 +227,18 @@ class App {
 	 *
 	 * @return Auth the authentication component
 	 */
-	public function auth() {
-		return $this->auth;
-	}
+    public function auth() {
+        if (!isset($this->auth)) {
+            // create the component
+            $this->auth = new Auth(
+                $this->db(),
+                $this->getClientIp(),
+                !empty($_ENV['DB_PREFIX']) ? $_ENV['DB_PREFIX'] : null
+            );
+        }
+
+        return $this->auth;
+    }
 
 	/**
 	 * Returns the component that can be used to encode and decode IDs conveniently for obfuscation
